@@ -87,8 +87,8 @@ var Game = {
 
 
     handleRndK: function() {
-        clientObj.set('randomKey', loginkey);
-        clientObj.write('<msg t="sys"><body action="rndK" r="-1"><k>' + loginkey + '</k></body></msg>');
+        var key = clientObj.get('randomKey');
+        clientObj.write('<msg t="sys"><body action="rndK" r="-1"><k>' + key + '</k></body></msg>');
     },
 
     handleLogin: function(data) {
