@@ -7,6 +7,7 @@ Current updates:
 1. Login server done.
 2. Game server done.
 3. Added some handlers to get the game running
+4. Items should work now, will update in the GitHub soon.
 
 Required modules:
 
