@@ -11,7 +11,7 @@
 	"Name": "Blizzard",
 	"Host": "localhost",
 	"Port": 6113
-	}
+	},
 	
     "Ports": {
     "Login": 6112,
