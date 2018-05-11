@@ -1,0 +1,15 @@
+{
+       "db": {
+        "host"     : "localhost",
+        "user"     : "root",
+        "password" : "",
+        "database" : "single"
+    },
+	
+	"Servers": {
+	"ID": 100,
+	"Name": "Blizzard",
+	"Host": "localhost",
+	"Port": 6113
+	}
+}
