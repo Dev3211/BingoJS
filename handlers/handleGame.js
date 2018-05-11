@@ -1,4 +1,3 @@
-
 var client = require('./client'),
     Crypto = require('./Crypto.js'),
 	error = require('./Errors.js'),
@@ -33,6 +32,7 @@ var self = {
             'j#js': 'handleJoinServer',
             'u#h': 'handleHeartBeat',
             'i#gi': 'handleGetInventory',
+			'u#gp': 'handleGetPlayer',
             'm#sm': 'handleSendMessage',
             'j#jr': 'handleJoinRoom',
 			'j#jp': 'handleJoinPlayerRoom',
@@ -46,6 +46,7 @@ var self = {
 			'p#pg': 'Test',
 			'u#ss': 'handleSafeMessage',
 			'g#gm': 'handleGetActiveIgloo',
+			'g#gr': 'handleLoadPlayerIglooList',
 			's#upc': 'handleUpdateClothing',
             's#uph': 'handleUpdateClothing',
             's#upf': 'handleUpdateClothing',
@@ -88,6 +89,16 @@ var self = {
         client.sendXt('h', -1);
     },
 	
+	handleGetPlayer: function(data, client){
+	var ID = parseInt(data[4])
+	connection.execute("SELECT * FROM `users` WHERE `ID` = ?", [ID], function(error, result, fields) {
+    if (result.length != 0) {	
+	const info = [result[0].ID, result[0].user, 1, result[0].color, result[0].head, result[0].face, result[0].neck, result[0].body, result[0].hand, result[0].feet, result[0].flag, result[0].photo];
+	client.sendXt('gp', -1, info.join('|') + '|')
+	}
+	});
+	},
+	
     handleraw: function(data, client) {
         var dataArr = data.split('%');
         dataArr.shift();
@@ -121,7 +132,9 @@ var self = {
         var y = data[6] ? data[6] : 0;
 		if (!x || isNaN(x)) x = 0
         if (!y || isNaN(y)) y = 0
+		if(client.room){
         roomManager.removeUser(client);
+		}
 		if (room > 900) {
 		client.set('gamingroom', room);
         return client.sendXt('jg', -1, room)
@@ -135,13 +148,28 @@ var self = {
 	
 	handleJoinPlayerRoom: function(data, client) {
         var room = parseInt(data[4]);
-		var x = data[5] ? data[5] : 0;
-        var y = data[6] ? data[6] : 0;
-		roomManager.removeUser(client);
-		if (room < 1000) room += 1000
-		client.sendXt('jp', -1, room)
-	    roomManager.addUser(room, client, [x, y]);
+		let x = parseInt(data[5])
+        let y = parseInt(data[6])
 		
+	    if (!x || isNaN(x)) x = 0
+        if (!y || isNaN(y)) y = 0
+		
+		if(client.room){
+		roomManager.removeUser(client);
+	    }
+		
+		if (room < 1000) room += 1000
+		
+		if (!roomManager.getRoom(room)) {
+            roomManager.createRoom(room)
+        }
+
+		var test = roomManager.getRoom(room)
+		if (test) {
+		 roomManager.addUser(room, client, [x, y]);
+		}else{
+		console.log('nope');
+		}
     },
 
     handleGetInventory: function(data, client) {
@@ -271,6 +299,23 @@ var self = {
 	client.addCoins(Math.floor(score/10))
 	}
 	client.sendXt('zo', -1, client.coins, 0, 0, 0, 0);
+	},
+	
+	handleLoadPlayerIglooList: function(data, client){
+	let iglooStr = ''
+	for (const id of Object.keys(roomManager.roomData)) {
+	 const room = roomManager.roomData[id]
+     if (id > 1000 && room.open) {
+	 const player = client.get('ID')
+	 if (player) {
+        iglooStr += '%' + (client.get('ID') + '|' + client.get('user'))
+      }
+	 }
+	}
+	if (iglooStr.length > 1) {
+	 return client.sendXt('gr', -1, iglooStr.substr(1))
+	 }
+	client.sendXt('gr', -1)
 	},
 	
     clients: []
