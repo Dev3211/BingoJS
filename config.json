@@ -1,5 +1,5 @@
 {
-       "db": {
+    "db": {
         "host"     : "localhost",
         "user"     : "root",
         "password" : "",
@@ -11,5 +11,10 @@
 	"Name": "Blizzard",
 	"Host": "localhost",
 	"Port": 6113
+	}
+	
+    "Ports": {
+    "Login": 6112,
+    "Game": 6113
 	}
 }
