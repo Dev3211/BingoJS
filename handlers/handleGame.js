@@ -1,7 +1,10 @@
+
 var client = require('./client'),
     Crypto = require('./Crypto.js'),
+	error = require('./Errors.js'),
     loginkey = Crypto.generateKey(),
     parseXml = require('xml2js').parseString,
+	itemCrumbs = require('./crumbs/items.json'),
     roomManager = require('./roomManager');
 
 var self = {
@@ -14,7 +17,18 @@ var self = {
             'j#jr': 'handleJoinRoom',
             'u#sp': 'handleSendPosition',
             'u#sb': 'handleSnowball',
-			'u#se': 'handleEmote'
+			'u#se': 'handleEmote',
+			'u#sf': 'handlesendFrame',
+			's#upc': 'handleUpdateClothing',
+            's#uph': 'handleUpdateClothing',
+            's#upf': 'handleUpdateClothing',
+            's#upn': 'handleUpdateClothing',
+            's#upb': 'handleUpdateClothing',
+            's#upa': 'handleUpdateClothing',
+            's#upe': 'handleUpdateClothing',
+            's#upl': 'handleUpdateClothing',
+            's#upp': 'handleUpdateClothing',
+			 'i#ai': 'handleAddItem'
         }
     },
     addClient: function(client) {
@@ -55,16 +69,6 @@ var self = {
         } else {
             console.log('Unhandled packet received: ' + handler);
         }
-    },
-
-    handleVerChk: function(data, client) {
-        client.write('<msg t="sys"><body action="apiOK" r="0"></body></msg>');
-    },
-
-
-    handleRndK: function(data, client) {
-        client.set('randomKey', loginkey);
-        client.write('<msg t="sys"><body action="rndK" r="-1"><k>' + loginkey + '</k></body></msg>');
     },
 
     handleJoinServer: function(data, client) {
@@ -112,10 +116,59 @@ var self = {
             y = data[5];
         roomManager.sendXt(client.get('room'), ['sb', -1, client.get('ID'), x, y]);
     },
+	
 	handleEmote: function(data, client) {
 	    var emote = data[4];
-	    roomManager.sendXt(client.get('room'), ['se', -1, client.get('ID'), x, y]);
+	    roomManager.sendXt(client.get('room'), ['se', -1, client.get('ID'), emote]);
     },
+	
+	handlesendFrame: function(data, client) {
+	   var frame = data[4];
+	   roomManager.sendXt(client.get('room'), ['sf', -1, client.get('ID'), frame]);
+	},
+	
+	handleUpdateClothing: function(data, client){
+    var item = data[4], type = data[2].substr(2);
+    var inventory = client.get('inventory');
+    var itemTypes = {
+      'upc': 'color',
+      'uph': 'head',
+      'upf': 'face',
+      'upn': 'neck',
+      'upb': 'body',
+      'upa': 'hand',
+      'upe': 'feet',
+      'upl': 'flag',
+      'upp': 'photo'
+    };
+    if(itemTypes[type]){
+      roomManager.sendXt(client.get('room'), [type, -1, client.get('ID'), item]);
+      client.updateClothing(itemTypes[type], item);
+    } else {
+    console.log('Item does not exist');
+    }
+    },
+	   
+	handleAddItem: function(data, client){
+	var item = parseInt(data[4]);
+    if(itemCrumbs[item]){
+      console.log('Adding item: ' + item);
+      var cost = itemCrumbs[item].Cost;
+      if(client.get('coins') < cost){
+        client.write('%xt%e%-1%' + NOT_ENOUGH_COINS + '%');
+        return;
+      }
+      if(client.get('inventory').indexOf(item) > -1){
+        client.write('%xt%e%-1%' + ALREADY_OWNS_INVENTORY_ITEM + '%');
+        return;
+      }
+      client.delCoins(cost);
+      client.addItem(item);
+    } else {
+      client.write('%xt%e%-1%' + ITEM_DOES_NOT_EXIST + '%');
+    }
+    },
+	
     clients: []
 }
 module.exports = self;
