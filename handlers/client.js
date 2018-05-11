@@ -1,5 +1,21 @@
 "use strict";
+var db = require('mysql2'),
+    config = require("../config");
 
+var connection = db.createConnection({
+    connectionLimit: 5,
+    host: config.db.host,
+    user: config.db.user,
+    password: config.db.password,
+    database: config.db.database
+});
+
+connection.connect(function(error) {
+    if (error) {
+        console.error('error connecting :' + error.stack);
+        process.exit(1);
+    }
+});
 
 var client = function (socket) {
 	var self = this;
@@ -10,14 +26,6 @@ var client = function (socket) {
 	this.x = 0;
 	this.y = 0;
 	this.frame = 1;
-
-	client.prototype.writeLogin = function (error) {
-		tcp.send.login(error);
-	};
-
-	client.prototype.writeGame = function (error) {
-		tcp.send.game(error);
-	};
 	
 	client.prototype.get = function (get) { 
         return this[get];
@@ -44,10 +52,6 @@ var client = function (socket) {
 		this.write('%xt%' + args + '%');
 	};
 
-
-	client.prototype.writeByte = function (byte) {
-		return this.data.push(byte);
-    };
 	
     client.prototype.setClient = function(data){
     self.ID = data.ID;
@@ -90,10 +94,42 @@ var client = function (socket) {
         return playerArr.join('|');
     };
 	
+	client.prototype.updateClothing = function(type, item){
+	self.set(type, item)	
+	var sql = 'UPDATE `users` SET ' + type + ' = ? WHERE `user` = ?';
+    var query = connection.execute(sql, [item, self.user], function(err, result) {
+    console.log("Updated item");
+	if(err) return console.log(err);
+    });
+	}
+	
 	client.prototype.getInventory = function(){
-	var args = Array.prototype.slice.call(self.inventory);
-    return args.join('%');
+	var test = self.inventory.split("%");
+	return test.join("%");
     }
+	
+	client.prototype.delCoins = function(coins){
+	var newCoins = (self.get('coins') - coins);
+	var sql = 'UPDATE `users` SET coins = ? WHERE `user` = ?';
+    var query = connection.execute(sql, [newCoins, self.user], function(err, result) {
+    console.log("Subtracted the coins.");
+	if(err) return console.log(err);
+    });
+	self.set('coins', newCoins);
+	}
+	
+	client.prototype.addItem = function(item){
+	 if(self.inventory.indexOf(item) == -1){
+	   var sql = 'UPDATE `users` SET `inventory` = ' + 'concat(inventory, "%",' + item + ')' + 'WHERE `user` = ?';
+	   var query = connection.execute(sql, [self.user], function(err, result) {
+       console.log("Bought item.");
+	   if(err) return console.log(err);
+       });
+       self.sendXt('ai', -1, item, self.get('coins'));
+     }
+     }  
+	
 };
 
 module.exports = client;
+
