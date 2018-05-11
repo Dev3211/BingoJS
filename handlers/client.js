@@ -38,7 +38,7 @@ var client = function (socket) {
 	client.prototype.write = function (data) {
 		if (this.socket) {
 			this.socket.write(data + '\0');
-			console.log('Outgoing data: ' + data.toString());
+			console.log('Outgoing data: ' + data);
 		}
 		// return this.socket;
 	};
