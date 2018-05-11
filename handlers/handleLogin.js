@@ -5,7 +5,7 @@ var Crypto = require('./Crypto.js'),
     config = require("../config"),
     md5 = require('md5'),
     client = require('./client'),
-    loginkey = 'singlejs';
+    loginkey = Crypto.generateKey();
 
 var connection = db.createConnection({
     connectionLimit: 5,
