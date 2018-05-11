@@ -7,3 +7,10 @@ Current updates:
 1. Login server done.
 2. Game server done.
 3. Added some handlers to get the game running
+
+Required modules:
+
+1. net
+2. md5
+3. xml2js
+4. js-logs
