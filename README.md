@@ -14,3 +14,4 @@ Required modules:
 2. md5
 3. xml2js
 4. js-logs
+5. mysql2
