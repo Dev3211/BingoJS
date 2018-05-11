@@ -1,10 +1,11 @@
 var login = require('./handlers/handleLogin');
-var client = require('./handlers/client');
-var logger = require('js-logs');
-var log = require('js-logs');
-var net = require('net');
+    client = require('./handlers/client'),
+    logger = require('js-logs'),
+    log = require('js-logs'),
+	config = require("./config"),
+    net = require('net');
 
-Login1 = 6112;
+Login1 = config.ports.Login;
 
 function Login() {
     console.log(log.success('The source is starting!'));
@@ -26,6 +27,5 @@ function Login() {
     });
 
 }
-
 
 Login();
