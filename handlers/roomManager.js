@@ -1,86 +1,77 @@
 var rooms = require("./crumbs/rooms");
+var items = require("./crumbs/items");
 var client = require('./client');
 
 var self = {
   roomData: [],
+  itemData: [],
+  clients: [],
   loadCrumbs: function(){
     for(var id in rooms){
       if(id < 900){
         self.roomData[id] = rooms[id];
-        self.roomData[id]['users'] = [];
       }
     }
+	for(var id1 in items){
+        self.itemData[id1] = items[id1];
+      }
     console.log('Room manager loaded ' + self.roomData.length + ' rooms.');
+	console.log('Items loaded: ' + self.itemData.length);
   },
   addUser: function(room, client, coords){
-    var x = coords[0], y = coords[1], internal = self.getInternal(room);
-    self.roomData[room].users.push(client);
-    client.set('room', room);
+    let x = coords[0], y = coords[1], internal = self.getInternal(room);
+	if (!x) x = 0
+    if (!y) y = 0
+	client.set('room', room);
     client.set('x', x);
     client.set('y', y);
+	client.set('frame', 1);
+	self.clients.push(client);
     self.sendXt(room, ['ap', -1, client.buildPlayerString()]);
-    if(room > 900){
-      // igloo
-    } else {
-      if(self.getCount(room) < 1){
-        client.sendXt('jr', -1, room);
+    if(self.clients.length > 0){
+		client.sendXt('jr', -1, room, self.buildRoomString(room));
       } else {
-        client.sendXt('jr', -1, room, self.buildRoomString(room));
+        client.sendXt('jr', -1, room);
       }
-    }
-  },
-  getCount: function(room){
-    var roomData = self.roomData[room].users;
-    if(roomData){
-      return roomData.length;
-    } else {
-      return 0;
-    }
-  },
-  getUsers: function(room){
-    var roomData = self.roomData[room].users;
-    if(roomData){
-      return roomData;
-    } else {
-      return [];
-    }
   },
   removeUser: function(client){
-    var room = client.get('room');
-    if(room){
-      var users = self.roomData[room].users;
-      if(users.length !== 0){
-        var index = users.indexOf(client);
-        if(index > -1){
-          users.splice(index, 1);
-          self.sendXt(room, ['rp', -1, client.get('ID')]);
-          self.roomData[room].users = users;
-        }
-      }
+    const index = self.clients.indexOf(client)
+	if (index > -1) {
+	 self.clients.splice(index, 1)
+     self.sendXt('rp', -1, client.id)
     }
   },
   buildRoomString: function(room){
-    var users = self.getUsers(room), roomStr = '';
-    users.forEach(function(user){
-      roomStr += '%' + user.buildPlayerString();
-    });
+    let roomStr = ''
+    for(const client of self.clients){
+      roomStr += '%' + client.buildPlayerString();
+    };
     return roomStr.substr(1);
   },
-  sendXt: function(room, data){
-    self.sendData(room, '%xt%' + data.join('%') + '%');
+  sendXt: function(){
+    const args = Array.prototype.join.call(arguments, '%')
+
+    this.sendData(`%xt%${args}%`)
   },
   sendData: function(room, data){
-    var users = self.getUsers(room);
-    users.forEach(function(user){
-      user.write(data);
-    });
+   for (const client1 of self.clients) {
+   client1.write(data)
+   }
   },
   getInternal: function(room){
-    console.log(room);
     return self.roomData[room].Internal;
+  },
+  createRoom: function(id){
+  if(!self.roomData[id]){
+  return self.roomData[id] = id;
+  }
+  },
+  getRoom: function (id) {
+   if (self.roomData[id]) return self.roomData[id];
   },
   roomExists: function(room){
     return self.roomData[room] ? true : false;
+	console.log(room)
   }
 }
 
