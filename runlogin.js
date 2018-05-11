@@ -5,7 +5,7 @@ var login = require('./handlers/handleLogin');
 	config = require("./config"),
     net = require('net');
 
-Login1 = config.ports.Login;
+Login1 = config.Ports.Login;
 
 function Login() {
     console.log(log.success('The source is starting!'));
