@@ -1,6 +1,7 @@
-var rooms = require("./crumbs/rooms");
-var items = require("./crumbs/items");
-var client = require('./client');
+var rooms = require("./crumbs/rooms"),
+    items = require("./crumbs/items"),
+    client = require('./client'),
+    error = require('./Errors.js');
 
 var self = {
   roomData: [],
@@ -28,35 +29,48 @@ var self = {
 	client.set('frame', 1);
 	self.clients.push(client);
     self.sendXt(room, ['ap', -1, client.buildPlayerString()]);
+	if(self.clients.length > self.roomData[room].MaxUsers){
+	 client.write('%xt%e%-1%' + ROOM_FULL + '%');
+    }
     if(self.clients.length > 0){
 		client.sendXt('jr', -1, room, self.buildRoomString(room));
       } else {
         client.sendXt('jr', -1, room);
       }
   },
+  getUsers: function(room){
+    var roomData = self.clients;
+    if(roomData){
+      return roomData;
+    } else {
+      return [];
+    }
+  },
   removeUser: function(client){
     const index = self.clients.indexOf(client)
+	var room = client.get('room');
 	if (index > -1) {
+	 var users = self.clients;
 	 self.clients.splice(index, 1)
-     self.sendXt('rp', -1, client.id)
+     self.sendXt(room, ['rp', -1, client.get('ID')])
+	 self.clients = users;
     }
   },
   buildRoomString: function(room){
-    let roomStr = ''
-    for(const client of self.clients){
-      roomStr += '%' + client.buildPlayerString();
-    };
-    return roomStr.substr(1);
+   var users = self.getUsers(room), roomStr = '';
+    users.forEach(function(user){
+      roomStr += '%' + user.buildPlayerString();
+    });
+   return roomStr.substr(1);
   },
-  sendXt: function(){
-    const args = Array.prototype.join.call(arguments, '%')
-
-    this.sendData(`%xt%${args}%`)
+  sendXt: function(room, data){
+  self.sendData(room, '%xt%' + data.join('%') + '%');
   },
   sendData: function(room, data){
-   for (const client1 of self.clients) {
-   client1.write(data)
-   }
+  var users = self.clients;
+  users.forEach(function(user){
+  user.write(data);
+  });
   },
   getInternal: function(room){
     return self.roomData[room].Internal;
