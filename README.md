@@ -16,3 +16,4 @@ Required modules:
 3. xml2js
 4. js-logs
 5. mysql2
+6. in_array
