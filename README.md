@@ -18,4 +18,4 @@ Required modules:
 5. mysql2
 6. in_array
 
-Credits to Nuno#6620 as he helped with the basic part of the project, which also helped me advance to the really advanced parts. Thank you :D
+Credits to Nuno#6620 as he helped with the basic part of the project, which also helped me advance to the really advanced parts of the project. Thank you :D
