@@ -13,7 +13,7 @@ Current updates:
 7. Added basic handlers to get the game stable.
 8. Buying furniture now works, I will update when I am done with all the igloo handlers.
 9. Separate tables for furniture and items.
-10. Player age fixed
+10.Player age fixed
 
 Required modules:
 
