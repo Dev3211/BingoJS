@@ -1,9 +1,9 @@
 var jf = require('jsonfile'),
     rooms = jf.readFileSync("./handlers/crumbs/rooms.json"),
     items = jf.readFileSync("./handlers/crumbs/items.json"),
-	furniture = jf.readFileSync("./handlers/crumbs/furniture.json"),
-	igloo = jf.readFileSync("./handlers/crumbs/igloo.json"),
-	igloofloor = jf.readFileSync("./handlers/crumbs/igloofloor.json"),
+    furniture = jf.readFileSync("./handlers/crumbs/furniture.json"),
+    igloo = jf.readFileSync("./handlers/crumbs/igloo.json"),
+    igloofloor = jf.readFileSync("./handlers/crumbs/igloofloor.json"),
     client = require('./client'),
     config = require('../config');
     error = require('./Errors.js');
