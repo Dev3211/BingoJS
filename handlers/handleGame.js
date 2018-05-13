@@ -1,5 +1,6 @@
 var client = require('./client'),
     Crypto = require('./Crypto.js'),
+    jf = require('jsonfile'),
     error = require('./Errors.js'),
     loginkey = Crypto.generateKey(),
     config = require("../config"),
