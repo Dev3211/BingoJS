@@ -21,18 +21,7 @@ var self = {
                     self.roomData[id] = rooms[id];
                 }
             }
-            for (var id1 in items) {
-                self.itemData[id1] = items[id1];
-            }
-            for (var id2 in furniture) {
-                self.furnitureData[id2] = furniture[id2];
-            }
-            for (var id3 in furniture) {
-                self.iglooData[id3] = igloo[id3];
-            }
-            for (var id4 in igloofloor) {
-                self.iglooFloor[id4] = igloofloor[id4];
-            }
+            
             console.log('Room manager loaded ' + self.roomData.length + ' rooms.');
             console.log('Items loaded: ' + Object.keys(items).length);
 	        console.log('Furnitures loaded: ' + Object.keys(furniture).length);
