@@ -10,7 +10,8 @@
 	"ID": 100,
 	"Name": "Blizzard",
 	"Host": "localhost",
-	"Port": 6113
+	"Port": 6113,
+	"maxUsers": 1000
 	},
 	
     "Ports": {
