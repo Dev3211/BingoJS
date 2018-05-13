@@ -6,10 +6,10 @@ var client = require('./client'),
     db = require('mysql2'),
     parseXml = require('xml2js').parseString,
     in_array = require('in_array'),
-    itemCrumbs = require('./crumbs/items.json'),
-    furnitureCrumbs = require('./crumbs/furniture.json'),
-    iglooFloors = require('./crumbs/igloofloor.json'),
-    iglooCrumbs = require('./crumbs/igloo.json'),
+    itemCrumbs = jf.readFileSync('./handlers/crumbs/items.json'),
+	furnitureCrumbs = jf.readFileSync('./handlers/crumbs/furniture.json'),
+	iglooFloors = jf.readFileSync('./handlers/crumbs/igloofloor.json'),
+	iglooCrumbs = jf.readFileSync('./handlers/crumbs/igloo.json'),
     roomManager = require('./roomManager');
 
 
