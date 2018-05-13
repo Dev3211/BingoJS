@@ -1,11 +1,12 @@
-var rooms = require("./crumbs/rooms"),
-    items = require("./crumbs/items"),
-    furniture = require("./crumbs/furniture"),
-    igloo = require("./crumbs/igloo"),
-    igloofloor = require("./crumbs/igloofloor"),
+var jf = require('jsonfile'),
+    rooms = jf.readFileSync("./handlers/crumbs/rooms.json"),
+    items = jf.readFileSync("./handlers/crumbs/items.json"),
+	furniture = jf.readFileSync("./handlers/crumbs/furniture.json"),
+	igloo = jf.readFileSync("./handlers/crumbs/igloo.json"),
+	igloofloor = jf.readFileSync("./handlers/crumbs/igloofloor.json"),
     client = require('./client'),
     config = require('../config');
-error = require('./Errors.js');
+    error = require('./Errors.js');
 
 var self = {
         roomData: [],
@@ -33,10 +34,10 @@ var self = {
                 self.iglooFloor[id4] = igloofloor[id4];
             }
             console.log('Room manager loaded ' + self.roomData.length + ' rooms.');
-            console.log('Items loaded: ' + self.itemData.length);
-            console.log('Furnitures loaded: ' + self.furnitureData.length);
-            console.log('Igloos loaded: ' + self.iglooData.length);
-            console.log('Igloos Floors loaded: ' + self.iglooFloor.length);
+            console.log('Items loaded: ' + Object.keys(items).length);
+	        console.log('Furnitures loaded: ' + Object.keys(furniture).length);
+	        console.log('Igloos loaded: ' + Object.keys(igloo).length);
+	        console.log('Igloo floors loaded: ' + Object.keys(igloofloor).length);
         },
         addUser: function(room, client, coords) {
             let x = coords[0],
